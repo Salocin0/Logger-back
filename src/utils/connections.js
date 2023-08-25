@@ -1,12 +1,13 @@
 import { connect } from 'mongoose';
 import EErrors from '../services/errors/enums.js';
 import CustomError from '../services/errors/custom-error.js';
-import {loggerDev} from './logger.js'
+import { selectedLogger } from './logger.js';
 
 export async function connectMongo() {
   try {
     await connect('mongodb+srv://Salocin0:bQJ5b9byQb6PlLWM@coder.qmxekir.mongodb.net/?retryWrites=true&w=majority');
-    loggerDev.info('plug to mongo!');
+    //selectedLogger.info('plug to mongo!');
+    console.log("plug to mongo!")
   } catch (e) {
     CustomError.createError({
       name: 'Error De Conexion a Base De Datos', 
@@ -15,4 +16,5 @@ export async function connectMongo() {
       code: EErrors.MONGO_CONNECTION_ERROR,
     });
   }
+  
 }

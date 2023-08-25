@@ -5,7 +5,7 @@ import { createHash, isValidPassword } from '../utils/bcrypt.js';
 import { UserModel } from '../DAO/models/mongoose/users.model.js';
 import GitHubStrategy from 'passport-github2';
 const LocalStrategy = local.Strategy;
-import { loggerDev } from '../utils/logger.js';
+import { selectedLogger } from '../utils/logger.js';
 
 export function iniPassport() {
   passport.use(
@@ -29,7 +29,7 @@ export function iniPassport() {
           const emails = await res.json();
           const emailDetail = emails.find((email) => email.verified == true);
           if (!emailDetail) {
-            loggerDev.error('cannot get a valid email for this user');
+            selectedLogger.error('cannot get a valid email for this user');
             return done(new Error('cannot get a valid email for this user'));
           }
           profile.email = emailDetail.email;
@@ -43,14 +43,14 @@ export function iniPassport() {
               rol: 'Usuario',
             };
             let userCreated = await UserModel.create(newUser);
-            loggerDev.info('User Registration succesful');
+            selectedLogger.info('User Registration succesful');
             return done(null, userCreated);
           } else {
-            loggerDev.info('User already exists');
+            selectedLogger.info('User already exists');
             return done(null, user);
           }
         } catch (e) {
-          loggerDev.error('Error in register'+e);
+          selectedLogger.error('Error in register'+e);
           return done(e);
         }
       }
@@ -61,23 +61,23 @@ export function iniPassport() {
     'login',
     new LocalStrategy({ usernameField: 'email' }, async (username, password, done) => {
       if (!username || !password) {
-        loggerDev.error('faltan datos');
+        selectedLogger.error('faltan datos');
         return done(null, false);
       }
       try {
         const user = await UserModel.findOne({ email: username });
         if (!user) {
-          loggerDev.error('user not found');
+          selectedLogger.error('user not found');
           return done(null, false);
         }
         if (!isValidPassword(password, user.password)) {
-          loggerDev.error('wrong password');
+          selectedLogger.error('wrong password');
           return done(null, false);
         }
-        loggerDev.info('User logged in succesfully');
+        selectedLogger.info('User logged in succesfully');
         return done(null, user);
       } catch (err) {
-        loggerDev.error('Error in login'+err);
+        selectedLogger.error('Error in login'+err);
         return done(err);
       }
     })
@@ -98,14 +98,14 @@ export function iniPassport() {
           }
           let user = await UserModel.findOne({ email: username });
           if (user) {
-            loggerDev.error('User already exists');
+            selectedLogger.error('User already exists');
             return done(null, false);
           }
           let newuser = await UserModel.create({ firstName, lastName, age, email, password: createHash(password), rol: 'user' });
-          loggerDev.info('User Registration succesful');
+          selectedLogger.info('User Registration succesful');
           return done(null, newuser);
         } catch (e) {
-          loggerDev.error('Error in register'+e);
+          selectedLogger.error('Error in register'+e);
           return done(e);
         }
       }
